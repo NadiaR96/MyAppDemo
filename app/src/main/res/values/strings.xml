@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">MyAppDemo</string>
+    <string name="Login_button">Login</string>
+    <string name="Welcome">Welcome to the initial demonstration of my Calendar app</string>
+    <string name="unknown_response">Unknown response</string>
+    <string name="signin_failed">Unsuccessful sign in</string>
+    <string name="user_profile">Please add your standard locations below</string>
+    <string name="profile_title">User Set Up</string>
+    <string name="user_name">Nadia Rodgers</string>
+    <string name="logout">Logout</string>
+    <string name="delete_user">Delete User</string>
+    <string name="sign_out_error">Failed to sign out</string>
+    <string name="user_deletion_error">Failed to delete user</string>
+    <string name="radio_car">driving</string>
+    <string name="radio_public">transit</string>
+    <string name="radio_walk">walking</string>
+    <string name="btn_display">Display Time</string>
+    <string name="demo_msg">Welcome to my Demo Screen.  This calculates the distance and time to travel. Please complete the details below</string>
+    <string name="title_activity_maps">Map</string>
+</resources>
