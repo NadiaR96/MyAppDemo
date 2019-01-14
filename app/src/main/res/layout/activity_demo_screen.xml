@@ -63,12 +63,13 @@
 
     <Button
         android:id="@+id/btnDisplay"
-        android:layout_width="343dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="8dp"
         android:text="@string/btn_display"
+        android:layout_width="fill_parent"
+        android:layout_weight="1"
         app:layout_constraintBottom_toTopOf="@+id/DeleteUser_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -151,6 +152,7 @@
             android:layout_width="254dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:checked="true"
             android:text="driving" />
 
         <RadioButton

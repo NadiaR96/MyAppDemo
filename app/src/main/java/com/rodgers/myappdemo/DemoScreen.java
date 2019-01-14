@@ -36,7 +36,6 @@ import java.net.URL;
 public class DemoScreen extends AppCompatActivity {
 
     private int INTERNET_PERMISSION_CODE = 1;
-    private int LOCATION_PERMISSION_CODE = 1;
     private RadioGroup radioMethodGroup;
     private RadioButton radioMethodButton;
     private Button btnDisplay;
@@ -48,7 +47,7 @@ public class DemoScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_demo_screen);
 
-
+        //get details for current user - if none found go back to login
         FirebaseUser currentUser =
                 FirebaseAuth.getInstance().getCurrentUser();
 
@@ -58,10 +57,12 @@ public class DemoScreen extends AppCompatActivity {
             return;
         }
 
+        //user found - display details on screen to confirm correct user
         TextView email = (TextView) findViewById(R.id.email);
         TextView displayname = (TextView) findViewById(R.id.displayname);
         email.setText(currentUser.getEmail());
         displayname.setText(currentUser.getDisplayName());
+        //wait for information to be entered by user and button click
         addListenerOnButton();
     }
 
@@ -74,24 +75,31 @@ public class DemoScreen extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                //set button to invisible
+                //following line of code will set button to invisible and limit to single call
+                //for demonstration purposes all multiple calls to show different functionality
                 //btnDisplay.setVisibility(View.INVISIBLE);
-                // get selected radio button from radioGroup
+
+                // get selected radio button from radioGroup - to give mode of travel
                 int selectedId = radioMethodGroup.getCheckedRadioButtonId();
 
                 // find the radiobutton by returned id
                 radioMethodButton = (RadioButton) findViewById(selectedId);
                 String mode;
                 mode = radioMethodButton.getText().toString();
-                // build example call based on fixed points
+
+                // build example call based on input locatioons and mode of travel
                 startLoc = (TextView) findViewById(R.id.editText_From);
                 endLoc = (TextView) findViewById(R.id.editTo);
                 origin = startLoc.getText().toString().trim();
                 destination = endLoc.getText().toString().trim();
-                //TODO split into different parts and combine
+
+                //TODO - for real app - split into different parts and combine
+                //TODO - for real app - will need to include arrival time for transit
+
                 URL_STRING = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins="+origin+"&destinations="+destination+"&mode="+mode+"&key=AIzaSyBAfAkbPGDVtnObUy7WQs60DykkqCoMW3g";
-                // Belfast  54.597014,-5.930013 - Jordanstown 54.688930,-5.882155;
-                //check for permissions
+
+                //NB INTERNET is SOFT permission so should be automatically given so this check is not really necessary
+                //Included here as permission for eg users phone location (ACCESS_FINE_LOCATION) may be necessary for call in real app
                 if (ContextCompat.checkSelfPermission(DemoScreen.this,
                         Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED) {
                    //Permission to use internet for call ok
@@ -107,6 +115,9 @@ public class DemoScreen extends AppCompatActivity {
         });
 
     }
+    //This code include for ease of transitioning to real app.
+    //If permission not already granted then this code asks for permission and then explains why permission required
+    //Process cancelled if permission not given
     private void requestInternetPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                 Manifest.permission.INTERNET)) {
@@ -146,12 +157,12 @@ public class DemoScreen extends AppCompatActivity {
             }
         }
     }
+    //end of request for permission
 
-    /**
-     * Async task class to get json response by making HTTP call
-     * Async task class is used because
-     * you cannot create a network connection on main thread
+    /* Start Async task class to get json response by making HTTP call
+     * Async task class is used as you cannot create a network connection on main thread
      */
+    /*adopted from various coding examples on GitHub and Stackoverflow */
     public class FetchInfo extends AsyncTask<Void, Void, Void> {
 
         ProgressDialog progressDialog;
@@ -174,7 +185,7 @@ public class DemoScreen extends AppCompatActivity {
             //cancel progress dialog
             super.onPostExecute(aVoid);
             progressDialog.dismiss();
-
+            //Toast included for testing purposes and commented out for demo
             //Toast.makeText(getApplicationContext(),
             //        "Connection successful.", Toast.LENGTH_SHORT).show();
         }
@@ -186,13 +197,12 @@ public class DemoScreen extends AppCompatActivity {
             StringBuilder jsonResults = new StringBuilder();
 
             try {
-                //setting URL to connect with
+                //setting URL to connect with = URL previously constructed
                 URL url = new URL(URL_STRING);
                 //creating connection
                 conn = (HttpURLConnection) url.openConnection();
-            /*
-            converting response into String
-            */
+
+                //converting response into String
                 InputStreamReader in = new InputStreamReader(conn.getInputStream());
                 int read;
                 char[] buff = new char[1024];
@@ -200,7 +210,7 @@ public class DemoScreen extends AppCompatActivity {
                     jsonResults.append(buff, 0, read);
                 }
                 response = jsonResults.toString();
-                //parse json
+                //parse json Log.d statements to aide with development
                 Log.d("JSON", response);
                 JSONObject root = new JSONObject(response);
                 JSONArray array_rows = root.getJSONArray("rows");
@@ -216,7 +226,10 @@ public class DemoScreen extends AppCompatActivity {
                 JSONObject object_distance = object_elements.getJSONObject("distance");
 
                 Log.d("JSON", "object_duration:" + object_duration);
-                //response = object_duration.getString("value") + "," + object_distance.getString("value");
+
+                /*response includes value and text - for purposes of demonstration we
+                 * are displaying text.  In real app would convert values received to ensure accuracy
+                 */
                 String duration = object_duration.getString("text");
                 String distance = object_distance.getString("text");
 
@@ -248,17 +261,8 @@ public class DemoScreen extends AppCompatActivity {
         });
 
     }
-    public void setDouble(String result) {
-        //
-        String res[]=result.split(",");
-        Double min=Double.parseDouble(res[0])/60;
-        int dist=Integer.parseInt(res[1])/1000;
-        String duration = "Duration= " + (int) (min / 60) + " hr " + (int) (min % 60) + " mins";
-        String distance = "Distance= " + dist + " kilometers";
-        tv_result1.setText(duration);
-        tv_result2.setText(distance);
-    }
 
+    /* Code from FirebaseUI Auth to signout of app */
     public void signOut(View view) {
         AuthUI.getInstance()
                 .signOut(this)
@@ -278,6 +282,7 @@ public class DemoScreen extends AppCompatActivity {
                     }
                 });
     }
+    /* Code from FirebaseUI Auth to delete */
     public void deleteAccount(View view) {
         AuthUI.getInstance()
                 .delete(this)
@@ -290,6 +295,8 @@ public class DemoScreen extends AppCompatActivity {
                             finish();
                         } else {
                             // Notify user of error
+                            //Addition of simple Toast to notify user.
+                            //TODO check for reason for error and expand explanation
                             Toast.makeText(getApplicationContext(),
                                     "Error deleting user - please try again.", Toast.LENGTH_SHORT).show();
                         }

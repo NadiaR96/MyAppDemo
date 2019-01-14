@@ -35,8 +35,8 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, DemoScreen.class));
             finish();
         } else {
-            // TODO this starts signin immediately - should welcome to app screen be displayed (would allow error messages)
-            //start login process
+            // Welcome to app screen displayed
+            //start login process when button clicked
             Button button = (Button) findViewById(R.id.Login_button);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -47,10 +47,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Next part of coding adapted from FireBaseUI Auth standard code on GitHub
     private List<AuthUI.IdpConfig> getProviderList() {
 
-        //list of sign in methods - only email considered here.
-        // TODO Consider adding additional signin methods if time
+        //list of sign in methods given in standard code- only email considered here.
+        // TODO For full app - Consider adding additional signin methods if time
         List<AuthUI.IdpConfig> providers = new ArrayList<>();
 
         providers.add(
@@ -61,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void authenticateUser() {
         //call to FirebaseUI to start sign in process
-        // TODO consider use of Smartlock (set to true if required)
-        // TODO consider Theme of Login - .setTheme(R.style.CustomTheme)
+        // TODO for full app - consider use of Smartlock (set to true if required)
+        // TODO for full app - consider Theme of Login - .setTheme(R.style.CustomTheme)
         startActivityForResult(
                 AuthUI.getInstance().createSignInIntentBuilder()
                         .setAvailableProviders(getProviderList())
@@ -89,25 +90,28 @@ public class MainActivity extends AppCompatActivity {
         } else {
             if (response == null) {
                 // User cancelled Sign-in
-                // TODO check use of Snackbar and change to main screen to display
+                // TODO check use of Snackbar to display errors
                 //Snackbar.make(findViewById(R.id.), R.string.email_sent,
                 //        Snackbar.LENGTH_SHORT)
                 //        .show();
-                //showSnackbar(R.string.sign_in_cancelled);
+                //Snackbar.show(R.string.sign_in_cancelled);
+                Log.e(TAG, "Sign-in cancelled: ", response.getError());
                 return;
             }
 
             if (response.getError().getErrorCode() == ErrorCodes.NO_NETWORK) {
                 // Device has no network connection
+                Log.e(TAG, "No network: ", response.getError());
                 return;
             }
 
             if (response.getError().getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
                 // Unknown error occurred
                 //showSnackbar(R.string.unknown_error);
-                //Log.e(TAG, "Sign-in error: ", response.getError());
+                Log.e(TAG, "Sign-in error: ", response.getError());
                 return;
             }
         }
     }
+    // End of coding adapted from FireBaseUI Auth standard code on GitHub
 }
